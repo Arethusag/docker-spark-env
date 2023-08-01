@@ -4,11 +4,18 @@ WORKDIR /app
 
 ADD . /app
 
+RUN apt-get update && apt-get install -y curl gnupg
+
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
+    apt-get install -y nodejs npm
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends openjdk-17-jre-headless && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+
 RUN pip install --no-cache-dir -r requirements.txt
-RUN apt-get update && apt-get install -y curl && \
-	curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
-    	apt-get install -y nodejs npm openjdk-17-jre-headless \
-	&& rm -rf /var/lib/apt/lists/*
 
 
 RUN node -v && npm -v
