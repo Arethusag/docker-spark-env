@@ -6,7 +6,7 @@ ADD . /app
 
 RUN apt-get update && apt-get install -y curl gnupg
 
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
+RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - && \
     apt-get install -y nodejs npm
 
 RUN apt-get update && \
