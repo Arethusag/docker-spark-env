@@ -6,7 +6,7 @@ WORKDIR /app
 ADD . /app
 
 # Install general dependencies
-RUN apt-get update && apt-get install -y curl gnupg nodejs npm r-base r-base-dev openjdk-17-jre-headless openssd-server&& \
+RUN apt-get update && apt-get install -y curl gnupg nodejs npm r-base r-base-dev openjdk-17-jre-headless openssh-server&& \
     rm -rf /var/lib/apt/lists/* && \
     R -e "install.packages(c('ggplot2', 'dplyr'), repos='https://cloud.r-project.org/')" && \
     pip install --no-cache-dir -r requirements.txt && \
