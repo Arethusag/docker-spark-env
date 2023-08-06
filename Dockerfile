@@ -2,26 +2,23 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
+# Copy application files
 ADD . /app
 
-RUN apt-get update && apt-get install -y curl gnupg
+# Install general dependencies
+RUN apt-get update && apt-get install -y curl gnupg nodejs npm r-base r-base-dev openjdk-17-jre-headless openssd-server&& \
+    rm -rf /var/lib/apt/lists/* && \
+    R -e "install.packages(c('ggplot2', 'dplyr'), repos='https://cloud.r-project.org/')" && \
+    pip install --no-cache-dir -r requirements.txt && \
+    pip install jupyter jupyter-lsp && \
+    npm install -g pyright
 
-RUN apt-get install -y nodejs npm
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends openjdk-17-jre-headless && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-
-RUN pip install --no-cache-dir -r requirements.txt
-
+# Install and set up Spark
 ARG SPARK_VERSION=3.4.1
 ARG HADOOP_VERSION=3
-RUN curl -O https://dlcdn.apache.org/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz \
-    && tar xzf spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz -C /usr/local/ \
-    && rm spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz
-
+RUN curl -O https://dlcdn.apache.org/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz && \
+    tar xzf spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz -C /usr/local/ && \
+    rm spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz
 
 ENV SPARK_HOME=/usr/local/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}
 ENV PATH="$SPARK_HOME/bin:$PATH"
@@ -30,10 +27,9 @@ ENV PYSPARK_PYTHON=python3
 ENV PYSPARK_DRIVER_PYTHON=python3
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/
 
-RUN pip install jupyter jupyter-lsp
-RUN npm install -g pyright
-
+# Jupyter configuration
 EXPOSE 8888
+RUN jupyter notebook --generate-config && \
+    echo "c.InteractiveShellApp.extensions.append('rpy2.ipython')" >> /root/.jupyter/jupyter_notebook_config.py
 
 CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--port=8888", "--allow-root", "--no-browser", "--NotebookApp.password='sha1:fb6df7c13e87:06137efb48ae21142033fca385f177a061bcc542'"]
-
