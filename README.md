@@ -1,6 +1,8 @@
 # Containerized Spark Environment
 This project started as a way to reproducably run spark jobs. While that basic functionality still remains, the project has expanded to provide the tools to host a remote jupyter server with a complete data science environment. In more recent iterations, capabilities have been added for Scikit-Learn, R, and SSH tunneling.
 
+--------------------------------------------
+
 ## Setup
 
 1. Ensure you have podman installed. If on Windows, WSL is also needed.
@@ -15,3 +17,11 @@ This project started as a way to reproducably run spark jobs. While that basic f
        - Mount Volume: `-v /path/to/local/volume:/app` add `:Z` if running into SElinux permissions issues.
 
 5. Access the jupyter server using http://localhost:8888. If running remotely, replace local host with the IP address of the host.
+
+-------------------------------------------
+
+## Todo
+
+- Add pytorch support *This will require changing from a pip managed environment to conda, a rework of the entire dockerfile*
+
+- Add SQL support to run queries in cells and return results via a JDBC connection.
