@@ -6,12 +6,18 @@ WORKDIR /app
 ADD . /app
 
 # Install general dependencies
-RUN apt-get update && apt-get install -y curl gnupg nodejs npm r-base r-base-dev openjdk-17-jre-headless openssh-server&& \
+RUN apt-get update && apt-get install -y curl gnupg nodejs npm r-base r-base-dev openjdk-17-jre-headless openssh-server && \
     rm -rf /var/lib/apt/lists/* && \
-    R -e "install.packages(c('ggplot2', 'dplyr'), repos='https://cloud.r-project.org/')" && \
+    R -e "install.packages(c('IRkernel','ggplot2', 'dplyr'), repos='https://cloud.r-project.org/')" && \
     pip install --no-cache-dir -r requirements.txt && \
     pip install jupyter jupyter-lsp && \
-    npm install -g pyright
+    npm install -g pyright && \
+    mkdir -p /var/run/sshd && \
+    echo 'root:Sivanandan19' | chpasswd && \
+    sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+
+# Install and set up R kernel
+RUN R -e "IRkernel::installspec(user = FALSE)"
 
 # Install and set up Spark
 ARG SPARK_VERSION=3.4.1
@@ -32,4 +38,7 @@ EXPOSE 8888
 RUN jupyter notebook --generate-config && \
     echo "c.InteractiveShellApp.extensions.append('rpy2.ipython')" >> /root/.jupyter/jupyter_notebook_config.py
 
-CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--port=8888", "--allow-root", "--no-browser", "--NotebookApp.password='sha1:fb6df7c13e87:06137efb48ae21142033fca385f177a061bcc542'"]
+ADD start.sh /start.sh
+RUN chmod +x /start.sh
+
+CMD ["/start.sh"]
