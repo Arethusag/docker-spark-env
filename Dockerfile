@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y curl gnupg nodejs npm r-base r-base-dev
     npm install -g pyright && \
     mkdir -p /var/run/sshd && \
     echo 'root:Sivanandan19' | chpasswd && \
-    sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
 # Install and set up R kernel
 RUN R -e "IRkernel::installspec(user = FALSE)"
@@ -35,6 +35,7 @@ ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/
 
 # Jupyter configuration
 EXPOSE 8888
+EXPOSE 22
 RUN jupyter notebook --generate-config && \
     echo "c.InteractiveShellApp.extensions.append('rpy2.ipython')" >> /root/.jupyter/jupyter_notebook_config.py
 
