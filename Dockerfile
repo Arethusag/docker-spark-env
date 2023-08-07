@@ -6,7 +6,7 @@ WORKDIR /app
 ADD . /app
 
 # Install general dependencies
-RUN apt-get update && apt-get install -y curl gnupg nodejs npm r-base r-base-dev openjdk-17-jre-headless openssh-server && \
+RUN apt-get update && apt-get install -y curl gnupg nodejs npm r-base r-base-dev openjdk-17-jre-headless openssh-server supervisor && \
     rm -rf /var/lib/apt/lists/* && \
     R -e "install.packages(c('IRkernel','ggplot2', 'dplyr'), repos='https://cloud.r-project.org/')" && \
     pip install --no-cache-dir -r requirements.txt && \
@@ -36,10 +36,8 @@ ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/
 # Jupyter configuration
 EXPOSE 8888
 EXPOSE 22
-RUN jupyter notebook --generate-config && \
-    echo "c.InteractiveShellApp.extensions.append('rpy2.ipython')" >> /root/.jupyter/jupyter_notebook_config.py
+# RUN jupyter notebook --generate-config && \
+#     echo "c.InteractiveShellApp.extensions.append('rpy2.ipython')" >> /root/.jupyter/jupyter_notebook_config.py
 
-ADD start.sh /start.sh
-RUN chmod +x /start.sh
-
-CMD ["/start.sh"]
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

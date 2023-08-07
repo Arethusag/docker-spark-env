@@ -1,11 +1,17 @@
-#Setup
-1) Install WSL2 https://learn.microsoft.com/en-us/windows/wsl/install-manual and Docker desktop https://www.docker.com/products/docker-desktop/.
+# Containerized Spark Environment
+This project started as a way to reproducably run spark jobs. While that basic functionality still remains, the project has expanded to provide the tools to host a remote jupyter server with a complete data science environment. In more recent iterations, capabilities have been added for Scikit-Learn, R, and SSH tunneling.
 
-2) Clone the repo from within WSL terminal, cd into project directory.
+## Setup
 
-3) run 'docker build -t docker-spark-env .'
-       'docker run -p 8888:8888 -v /mnt/c/users/INSERT-YOUR-USERNAME:/app docker-spark-env' where your username is your windows username. This mounts your windows home directory to the jupyter server so your files will persist. Anything written to the container itself is volatile.
+1. Ensure you have podman installed. If on Windows, WSL is also needed.
 
-4) Access the notebook in a browser from http://localhost:8888/tree?token=INSERT-YOUR-TOKEN where your token is taken from the terminal output, it should look something like this: 1622b38d00299b7e98eabc6089520fe82e487076612a54eb
+2. Clone the repo, cd into project directory.
 
-It is also possible to connect to the jupyter server from any ide that supports it.
+3. Build the image `podman build -t docker-spark-env .`
+       
+4. Run the image `podman run -p 8888:8888 docker-spark-env`. Other usefull run options
+
+       - SSH: `-p 2222:22` opens port 2222 for connecting to the container via SSH.
+       - Mount Volume: `-v /path/to/local/volume:/app` add `:Z` if running into SElinux permissions issues.
+
+5. Access the jupyter server using http://localhost:8888. If running remotely, replace local host with the IP address of the host.
